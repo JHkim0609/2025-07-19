@@ -2,6 +2,7 @@ package com.example.chapter3;
 
 import lombok.Getter;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,10 +23,29 @@ public class TodoController {
         return todos;
     }
 
+    @GetMapping("/{id}")
+    public Todo getTodo(@PathVariable long id){
+        return todos.stream().filter(todo -> todo.getId() == id).findFirst().orElse(null);
+    }
+
     @GetMapping("/add")
     public Todo add(String body){
         Todo todo = Todo.builder().id(++todosLastId).body(body).build();
         todos.add(todo);
         return todo;
+    }
+
+    @GetMapping("/remove/{id}")
+    public boolean remove(@PathVariable long id){
+        boolean removed = todos.removeIf((todo -> todo.getId() == id));
+        return removed;
+    }
+
+    @GetMapping("/modify/{id}")
+    public boolean remove(@PathVariable long id, String body){
+        Todo todo = todos.stream().filter(_todo -> _todo.getId() == id).findFirst().orElse(null);
+        if(todo == null) return false;
+        todo.setBody(body);
+        return true;
     }
 }
